@@ -50,10 +50,6 @@ const app = express();
 
 app.use(cors());
 
-app.listen(1121, () => {
-    console.log("Listening on port 1121.");
-});
-
 app.get('/phone/:id', async (req, res) => {
     try {
         const client = await pool.connect()
@@ -122,4 +118,8 @@ app.get('/update', async (req, res) => {
     // console.log(await scrapeBestBuy('https://www.bestbuy.com/site/apple-iphone-14-128gb-unlocked-midnight/6507555.p?skuId=6507555'));
 
     // res.send("Update Complete!");
+});
+
+app.listen(1121, () => {
+    console.log("Listening on port 1121.");
 });
