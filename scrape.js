@@ -1,6 +1,9 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const scrapeAmazon = async url => {
     try {
@@ -22,8 +25,13 @@ const scrapeAmazon = async url => {
 const scrapeBestBuy = async url => {
     try {
         const browser = await puppeteer.launch({
-            headless: false,
-            defaultViewport: null,
+            args: [
+                "--disable-setuid-sandbox",
+                "--no-sandbox",
+                "--single-process",
+                "--no-zygote"
+            ],
+            executablePath: process.env.NODE_ENV = 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath()
         });
 
         const page = await browser.newPage();
