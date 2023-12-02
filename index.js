@@ -1,5 +1,5 @@
 import express from 'express';
-
+import cors from 'cors';
 import pg from 'pg'
 const pool = new pg.Pool({
     host: 'dpg-cljq7518mmjc73dbb770-a.oregon-postgres.render.com',
@@ -47,6 +47,8 @@ const bestBuyURLArr =
 'https://www.bestbuy.com/site/samsung-galaxy-s22-ultra-128gb-phantom-black-verizon/6494471.p?skuId=6494471'];
 
 const app = express();
+
+app.use(cors());
 
 app.listen(1121, () => {
     console.log("Listening on port 1121.");
