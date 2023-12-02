@@ -29,6 +29,7 @@ const scrapeBestBuy = async url => {
             args: [
                 "--disable-setuid-sandbox",
                 "--no-sandbox",
+                '--disable-dev-shm-usage',
                 "--no-zygote"
             ],
             executablePath: process.env.NODE_ENV = 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath()
