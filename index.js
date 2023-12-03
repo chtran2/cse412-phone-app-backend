@@ -23,8 +23,8 @@ const amazonURLArr =
 'https://www.amazon.com/SAMSUNG-Factory-Unlocked-Smartphone-Adaptive/dp/B0BLP2PY6N/ref=sr_1_3?crid=2HVALILXLH0MA&keywords=galaxy+s23&qid=1701484200&sprefix=galaxy+s2%2Caps%2C179&sr=8-3',
 'https://www.amazon.com/SAMSUNG-Factory-Unlocked-Smartphone-Adaptive/dp/B0BLP4J9RR/ref=sr_1_2?crid=1ZY9NESOLQ163&keywords=galaxy+s23+plus&qid=1701484231&sprefix=galaxy+s23+plu%2Caps%2C144&sr=8-2',
 'https://www.amazon.com/SAMSUNG-Factory-Unlocked-Android-Smartphone/dp/B0BLP45GY8/ref=sr_1_3?crid=1872S7S994AAK&keywords=galaxy+s23+ultra&qid=1701484242&sprefix=galaxy+s23+ult%2Caps%2C161&sr=8-3',
-'https://www.amazon.com/SAMSUNG-Unlocked-Smartphone-Processor-Graphite/dp/B0CD9645MM/ref=sr_1_3?crid=1PEVI7CKBWHDN&keywords=galaxy+s23+fe&qid=1701484256&sprefix=galaxy+s23+f%2Caps%2C169&sr=8-3',
-'https://www.amazon.com/Apple-iPhone-Pro-128GB-Gold/dp/B0BYLTKTY5/ref=sr_1_4?crid=UYTH1J4GOVSS&keywords=iphone+14+pro+128gb+boost&qid=1701482597&sprefix=iphone+14+pro+128gb+boost%2Caps%2C136&sr=8-4',
+'https://www.amazon.com/SAMSUNG-Unlocked-Android-Smartphone-Processor/dp/B0CD92Y9LB/ref=sr_1_3?crid=C747MGGONXTJ&keywords=galaxy%2Bs23%2Bfe&qid=1701562484&sprefix=galaxy%2Bs23%2Bfe%2Caps%2C203&sr=8-3&th=1',
+'https://www.amazon.com/Apple-iPhone-14-Pro-128GB/dp/B0BN95FRW9/ref=sr_1_1?crid=1WXT0HFLZ8MFI&keywords=iphone+14+pro+128gb&qid=1701563506&sprefix=iphone+14+pro+128g%2Caps%2C142&sr=8-1',
 'https://www.amazon.com/Apple-iPhone-14-Pro-Max/dp/B0BN94DL3R/ref=sr_1_3?crid=SAX5GTT752P1&keywords=iphone+14+pro+max+128gb+boost&qid=1701482616&sprefix=iphone+14+pro+max+128gb+boost%2Caps%2C142&sr=8-3',
 'https://www.amazon.com/SAMSUNG-Smartphone-Unlocked-Brightest-Processor/dp/B09MVZLWKJ/ref=sr_1_3?crid=SDKPVSNFLNLZ&keywords=galaxy+s22&qid=1701484841&sprefix=galaxy+s22%2Caps%2C182&sr=8-3',
 'https://www.amazon.com/Samsung-Smartphone-Unlocked-Brightest-Processor/dp/B09VH9BKHS/ref=sr_1_2?crid=O8LPELTUOKOG&keywords=galaxy+s22%2B&qid=1701484867&sprefix=galaxy+s22%2B%2Caps%2C149&sr=8-2',
@@ -76,6 +76,8 @@ app.get('/phone/:id/price', async (req, res) => {
 
 app.get('/update', async (req, res) => {
     res.send("Web Scrape Refresh");
+
+    console.log("\nAmazon Web Scrape:");
     for(let i = 0; i < amazonURLArr.length; i++) {
         try {
             let price = (await scrapeAmazon(amazonURLArr[i])).replace(/[^0-9.]/g, "");
@@ -95,6 +97,7 @@ app.get('/update', async (req, res) => {
         }
     }
 
+    console.log("\nBest Buy Web Scrape:");
     for (let i = 0; i < bestBuyURLArr.length; i++) {
         try {
             let price = (await scrapeBestBuy(bestBuyURLArr[i])).replace(/[^0-9.]/g, "");

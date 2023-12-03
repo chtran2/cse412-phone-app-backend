@@ -25,21 +25,25 @@ const scrapeAmazon = async url => {
 const scrapeBestBuy = async url => {
     try {
         const browser = await puppeteer.launch({
+            // headless: false,
+            // defaultViewport: null,
             headless: "new",
             args: [
                 "--disable-setuid-sandbox",
                 "--no-sandbox",
-                '--disable-dev-shm-usage',
-                "--no-zygote"
+                "--no-zygote",
+                "--disable-http2"
             ],
             executablePath: process.env.NODE_ENV = 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath()
+            // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH
         });
 
         const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36')
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36');
 
         await page.goto(url, {
             waitUntil: "domcontentloaded",
+            timeout: 100000
         });
 
         const price = await page.evaluate(() => {
