@@ -73,17 +73,18 @@ app.post('/login', async (req, res) => {
         // console.log(dbPassword);
         
         if(username !== dbUsername) {
-            console.log("incorrect username");
-            res.send({"message": "incorrect username"});
+            console.log("username not found");
+            res.status(400).send({"message": "username not found"});
         } else if(password !== dbPassword) {
             console.log("incorrect password");
-            res.send({"message": "incorrect password"});
+            res.status(400).send({"message": "incorrect password"});
         } else {
             console.log(username + " logged in");
-            res.send({"message": "logged in"});
+            res.status(200).send({"message": "logged in"});
         }
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -104,15 +105,16 @@ app.post('/register', async (req, res) => {
         if(username !== dbUsername) {
             const result = await client.query(`INSERT INTO Users VALUES(${id}, '${username}', '${password}');`);
             console.log(username + " account created.");
-            res.send(username + " account created.");
+            res.status(200).send({"message": "account created"});
         } else {
             console.log(username + " already exists.");
-            res.send(username + " already exists.");
+            res.status(400).send({"message": "account already exists"});
         }
 
         client.release();
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -126,13 +128,25 @@ app.post('/phone/:id/review', async (req, res) => {
         const client = await pool.connect();
         const userId = (await client.query(`SELECT user_id FROM Users WHERE username = '${username}';`)).rows[0].user_id;
         // console.log(userId);
-        const result = await client.query(`INSERT INTO WriteReview VALUES(${phoneId}, ${userId}, ${rating});`);
 
-        console.log(rating + "/5 rating posted by " + username);
-        res.status(200).send({"message": "success"});
+        const checkReview = (await client.query(`SELECT rating_point FROM WriteReview WHERE phone_id = ${phoneId} AND user_id = ${userId}`)).rowCount;
+
+        if(checkReview > 0) {
+            // console.log("already exists");
+            const result = await client.query(`UPDATE WriteReview SET rating_point = ${rating} WHERE phone_id = ${phoneId} AND user_id = ${userId};`);
+            console.log(rating + "/5 rating updated by " + username);
+            res.status(200).send({ "message": "rating successfully updated" });
+        } else {
+            // console.log("doesn't exist");
+            const result = await client.query(`INSERT INTO WriteReview VALUES(${phoneId}, ${userId}, ${rating});`);
+            console.log(rating + "/5 rating posted by " + username);
+            res.status(200).send({"message": "rating successfully posted"});
+        }
+        
         client.release();
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -143,11 +157,12 @@ app.get('/phone/:id/review', async (req, res) => {
         
         const client = await pool.connect();
         const result = await client.query(`SELECT AVG(rating_point) FROM WriteReview WHERE phone_id = ${phoneId}`);
-        res.send(result.rows);
+        res.status(200).send(result.rows);
         console.log(result.rows);
         client.release();
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -155,11 +170,12 @@ app.get('/phone/:id', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`SELECT * FROM mobilephone WHERE phone_id = ${req.params.id};`);
-        res.send(result.rows);
+        res.status(200).send(result.rows);
         console.log(result.rows);
         client.release();
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -167,11 +183,12 @@ app.get('/phone/:id/price', async (req, res) => {
     try {
         const client = await pool.connect();
         const result = await client.query(`SELECT name, price FROM retailer JOIN retrieveprice ON retailer.retailer_id = retrieveprice.retailer_id WHERE phone_id = ${req.params.id};`);
-        res.send(result.rows);
+        res.status(200).send(result.rows);
         console.log(result.rows);
         client.release();
     } catch (err) {
         console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -194,7 +211,8 @@ app.get('/update', async (req, res) => {
             // console.log(result);
             client.release();
         } catch (err) {
-            console.log(err);
+            // console.log(err);
+            // res.status(500).send(err);
         }
     }
 
@@ -214,7 +232,8 @@ app.get('/update', async (req, res) => {
             // console.log(result);
             client.release();
         } catch (err) {
-            console.log(err);
+            // console.log(err);
+            // res.status(500).send(err);
         }
     }
 
