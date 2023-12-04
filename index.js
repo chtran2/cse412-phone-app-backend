@@ -95,7 +95,7 @@ app.post('/register', async (req, res) => {
         const client = await pool.connect();
         const id = (await client.query(`SELECT user_id FROM Users;`)).rowCount + 1;
         // console.log(id);
-        const result = await client.query(`INSERT INTO Users VALUES('${id}', '${username}', '${password}');`);
+        const result = await client.query(`INSERT INTO Users VALUES(${id}, '${username}', '${password}');`);
 
         console.log(username + " account created.");
         res.send(username + " account created.");
@@ -115,7 +115,7 @@ app.post('/review', async (req, res) => {
         const client = await pool.connect();
         const userId = (await client.query(`SELECT user_id FROM Users WHERE username = '${username}';`)).rows[0].user_id;
         // console.log(userId);
-        const result = await client.query(`INSERT INTO WriteReview VALUES('${phoneId}', '${userId}', '${rating}');`);
+        const result = await client.query(`INSERT INTO WriteReview VALUES(${phoneId}, ${userId}, ${rating});`);
 
         console.log(rating + "/5 rating posted.");
         res.send(rating + "/5 rating posted.");
@@ -131,7 +131,7 @@ app.get('/review', async (req, res) => {
         const phoneId = req.body.phone_id;
         
         const client = await pool.connect();
-        const result = await client.query(`SELECT AVG(rating_point) FROM WriteReview WHERE phone_id = '${phoneId}'`);
+        const result = await client.query(`SELECT AVG(rating_point) FROM WriteReview WHERE phone_id = ${phoneId}`);
         res.send(result.rows);
         console.log(result.rows);
         client.release();
