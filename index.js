@@ -95,40 +95,51 @@ app.post('/register', async (req, res) => {
         const client = await pool.connect();
         const id = (await client.query(`SELECT user_id FROM Users;`)).rowCount + 1;
         // console.log(id);
-        const result = await client.query(`INSERT INTO Users VALUES(${id}, '${username}', '${password}');`);
 
-        console.log(username + " account created.");
-        res.send(username + " account created.");
+        let dbUsername = (await client.query(`SELECT username FROM Users WHERE username = '${username}';`)).rows;
+        if(dbUsername.length > 0) {
+            dbUsername = dbUsername[0].username;
+        }
+
+        if(username !== dbUsername) {
+            const result = await client.query(`INSERT INTO Users VALUES(${id}, '${username}', '${password}');`);
+            console.log(username + " account created.");
+            res.send(username + " account created.");
+        } else {
+            console.log(username + " already exists.");
+            res.send(username + " already exists.");
+        }
+
         client.release();
     } catch (err) {
         console.log(err);
     }
 });
 
-app.post('/review', async (req, res) => {
+app.post('/phone/:id/review', async (req, res) => {
     try {
         // console.log(req.body);
         const username = req.body.username;
-        const phoneId = req.body.phone_id;
         const rating = req.body.rating;
+        const phoneId = req.params.id;
 
         const client = await pool.connect();
         const userId = (await client.query(`SELECT user_id FROM Users WHERE username = '${username}';`)).rows[0].user_id;
         // console.log(userId);
         const result = await client.query(`INSERT INTO WriteReview VALUES(${phoneId}, ${userId}, ${rating});`);
 
-        console.log(rating + "/5 rating posted.");
-        res.send(rating + "/5 rating posted.");
+        console.log(rating + "/5 rating posted by " + username);
+        res.status(200).send({"message": "success"});
         client.release();
     } catch (err) {
         console.log(err);
     }
 });
 
-app.get('/review', async (req, res) => {
+app.get('/phone/:id/review', async (req, res) => {
     try {
         // console.log(req.body);
-        const phoneId = req.body.phone_id;
+        const phoneId = req.params.id;
         
         const client = await pool.connect();
         const result = await client.query(`SELECT AVG(rating_point) FROM WriteReview WHERE phone_id = ${phoneId}`);
