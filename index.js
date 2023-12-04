@@ -49,10 +49,100 @@ const bestBuyURLArr =
 const app = express();
 
 app.use(cors());
+app.use(express.json());
+
+app.post('/login', async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+
+        const client = await pool.connect();
+
+        let dbUsername = (await client.query(`SELECT username FROM Users WHERE username = '${username}';`)).rows;
+        let dbPassword = (await client.query(`SELECT password FROM Users WHERE password = '${password}';`)).rows;
+
+        if(dbUsername.length > 0) {
+            dbUsername = dbUsername[0].username;
+        }
+
+        if(dbPassword.length > 0) {
+            dbPassword = dbPassword[0].password;
+        }
+
+        // console.log(dbUsername);
+        // console.log(dbPassword);
+        
+        if(username !== dbUsername) {
+            console.log("incorrect username");
+            res.send({"message": "incorrect username"});
+        } else if(password !== dbPassword) {
+            console.log("incorrect password");
+            res.send({"message": "incorrect password"});
+        } else {
+            console.log(username + " logged in");
+            res.send({"message": "logged in"});
+        }
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+app.post('/register', async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+
+        const client = await pool.connect();
+        const id = (await client.query(`SELECT user_id FROM Users;`)).rowCount + 1;
+        // console.log(id);
+        const result = await client.query(`INSERT INTO Users VALUES('${id}', '${username}', '${password}');`);
+
+        console.log(username + " account created.");
+        res.send(username + " account created.");
+        client.release();
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+app.post('/review', async (req, res) => {
+    try {
+        // console.log(req.body);
+        const username = req.body.username;
+        const phoneId = req.body.phone_id;
+        const rating = req.body.rating;
+
+        const client = await pool.connect();
+        const userId = (await client.query(`SELECT user_id FROM Users WHERE username = '${username}';`)).rows[0].user_id;
+        // console.log(userId);
+        const result = await client.query(`INSERT INTO WriteReview VALUES('${phoneId}', '${userId}', '${rating}');`);
+
+        console.log(rating + "/5 rating posted.");
+        res.send(rating + "/5 rating posted.");
+        client.release();
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+app.get('/review', async (req, res) => {
+    try {
+        // console.log(req.body);
+        const phoneId = req.body.phone_id;
+        
+        const client = await pool.connect();
+        const result = await client.query(`SELECT AVG(rating_point) FROM WriteReview WHERE phone_id = '${phoneId}'`);
+        res.send(result.rows);
+        console.log(result.rows);
+        client.release();
+    } catch (err) {
+        console.log(err);
+    }
+});
 
 app.get('/phone/:id', async (req, res) => {
     try {
-        const client = await pool.connect()
+        const client = await pool.connect();
         const result = await client.query(`SELECT * FROM mobilephone WHERE phone_id = ${req.params.id};`);
         res.send(result.rows);
         console.log(result.rows);
@@ -64,7 +154,7 @@ app.get('/phone/:id', async (req, res) => {
 
 app.get('/phone/:id/price', async (req, res) => {
     try {
-        const client = await pool.connect()
+        const client = await pool.connect();
         const result = await client.query(`SELECT name, price FROM retailer JOIN retrieveprice ON retailer.retailer_id = retrieveprice.retailer_id WHERE phone_id = ${req.params.id};`);
         res.send(result.rows);
         console.log(result.rows);
@@ -88,7 +178,7 @@ app.get('/update', async (req, res) => {
             }
             console.log(price);
 
-            const client = await pool.connect()
+            const client = await pool.connect();
             const result = await client.query(`UPDATE retrieveprice SET price = ${price} WHERE phone_id = ${i + 1} AND retailer_id = 1;`);
             // console.log(result);
             client.release();
@@ -108,7 +198,7 @@ app.get('/update', async (req, res) => {
             }
             console.log(price);
 
-            const client = await pool.connect()
+            const client = await pool.connect();
             const result = await client.query(`UPDATE retrieveprice SET price = ${price} WHERE phone_id = ${i + 1} AND retailer_id = 2;`);
             // console.log(result);
             client.release();
