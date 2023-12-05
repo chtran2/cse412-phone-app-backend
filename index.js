@@ -74,17 +74,17 @@ app.post('/login', async (req, res) => {
         
         if(username !== dbUsername) {
             console.log("username not found");
-            res.status(400).send({"message": "username not found"});
+            res.send({"message": "username not found"});
         } else if(password !== dbPassword) {
             console.log("incorrect password");
-            res.status(400).send({"message": "incorrect password"});
+            res.send({"message": "incorrect password"});
         } else {
             console.log(username + " logged in");
             res.status(200).send({"message": "logged in"});
         }
     } catch (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.send(err);
     }
 });
 
@@ -108,13 +108,13 @@ app.post('/register', async (req, res) => {
             res.status(200).send({"message": "account created"});
         } else {
             console.log(username + " already exists.");
-            res.status(400).send({"message": "account already exists"});
+            res.send({"message": "account already exists"});
         }
 
         client.release();
     } catch (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.send(err);
     }
 });
 
@@ -146,7 +146,7 @@ app.post('/phone/:id/review', async (req, res) => {
         client.release();
     } catch (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.send(err);
     }
 });
 
@@ -162,7 +162,7 @@ app.get('/phone/:id/review', async (req, res) => {
         client.release();
     } catch (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.send(err);
     }
 });
 
@@ -175,7 +175,7 @@ app.get('/phone/:id', async (req, res) => {
         client.release();
     } catch (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.send(err);
     }
 });
 
@@ -188,7 +188,7 @@ app.get('/phone/:id/price', async (req, res) => {
         client.release();
     } catch (err) {
         console.log(err);
-        res.status(500).send(err);
+        res.send(err);
     }
 });
 
@@ -212,7 +212,7 @@ app.get('/update', async (req, res) => {
             client.release();
         } catch (err) {
             // console.log(err);
-            // res.status(500).send(err);
+            // res.send(err);
         }
     }
 
@@ -233,7 +233,7 @@ app.get('/update', async (req, res) => {
             client.release();
         } catch (err) {
             // console.log(err);
-            // res.status(500).send(err);
+            // res.send(err);
         }
     }
 
